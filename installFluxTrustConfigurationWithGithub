@@ -356,3 +356,88 @@ grep -R git .
 ./chart/.helmignore:.git/
 ./chart/.helmignore:.gitignore
 ./nginxhello-hr.yaml:    git: ssh://git@github.com/monicamarshall/gitops-nginxhello.git
+
+
+set flux ignore to false
+
+###################### Commit changes to the repo to have flux install the helm release:
+
+git add -A
+
+git status
+
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   chart/Chart.yaml
+	modified:   nginxhello-hr.yaml
+	new file:   ../installFluxTrustConfigurationWithGithub
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+
+git commit -m "Start tracking the nginxhello helm release resource"
+[master 832fbd2] Start tracking the nginxhello helm release resource
+ 3 files changed, 361 insertions(+), 3 deletions(-)
+ create mode 100644 installFluxTrustConfigurationWithGithub
+
+ git push -f origin master
+Username for 'https://github.com': monicamarshall
+Password for 'https://monicamarshall@github.com': 
+Enumerating objects: 12, done.
+Counting objects: 100% (12/12), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 5.83 KiB | 5.83 MiB/s, done.
+Total 7 (delta 4), reused 0 (delta 0)
+remote: Resolving deltas: 100% (4/4), completed with 4 local objects.
+To https://github.com/monicamarshall/gitops-nginxhello.git
+ + 175b2dc...832fbd2 master -> master (forced update)
+
+
+kubectl get hr
+NAME            RELEASE                 PHASE       STATUS     MESSAGE                                                                         AGE
+nginxhello-hr   default-nginxhello-hr   Succeeded   deployed   Release was successful for Helm release 'default-nginxhello-hr' in 'default'.   2m46s
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+helm list
+NAME                 	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART           	APP VERSION
+default-nginxhello-hr	default  	1       	2021-03-24 04:05:55.974655289 +0000 UTC	deployed	nginxhello-1.0.0	1.19.0     
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+
+kubectl get all
+NAME                                         READY   STATUS    RESTARTS   AGE
+pod/default-nginxhello-hr-56bd8b4bdc-bm7gq   1/1     Running   0          3m31s
+pod/default-nginxhello-hr-56bd8b4bdc-d47db   1/1     Running   0          3m31s
+pod/default-nginxhello-hr-56bd8b4bdc-fz4dt   1/1     Running   0          3m31s
+pod/default-nginxhello-hr-56bd8b4bdc-kl7kr   1/1     Running   0          3m31s
+pod/default-nginxhello-hr-56bd8b4bdc-ztfs9   1/1     Running   0          3m31s
+pod/nginxhello-8f55d85d5-2qg2s               1/1     Running   0          3m34s
+pod/nginxhello-8f55d85d5-ftkhc               1/1     Running   0          3m30s
+pod/nginxhello-8f55d85d5-lgstt               1/1     Running   0          3m30s
+pod/nginxhello-8f55d85d5-nb2mw               1/1     Running   0          3m34s
+pod/nginxhello-8f55d85d5-rn98d               1/1     Running   0          3m34s
+
+NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE
+service/default-nginxhello-hr   ClusterIP   10.109.68.67     <none>        80/TCP    3m31s
+service/kubernetes              ClusterIP   10.96.0.1        <none>        443/TCP   63d
+service/nginxhello              ClusterIP   10.102.132.120   <none>        80/TCP    10h
+
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/default-nginxhello-hr   5/5     5            5           3m31s
+deployment.apps/nginxhello              5/5     5            5           10h
+
+NAME                                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/default-nginxhello-hr-56bd8b4bdc   5         5         5       3m31s
+replicaset.apps/nginxhello-6779778f7f              0         0         0       125m
+replicaset.apps/nginxhello-85ccf4896c              0         0         0       115m
+replicaset.apps/nginxhello-8f55d85d5               5         5         5       10h
+
+
