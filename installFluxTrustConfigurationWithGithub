@@ -1,0 +1,358 @@
+initialize repo code and push to repo as origin master
+
+git init 
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ git add .
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ git commit -m "first commit"
+
+git commit -m "first commit"
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ git remote add origin https://github.com/monicamarshall/gitops-nginxhello.git
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ git push origin master
+Username for 'https://github.com': monicamarshall
+Password for 'https://monicamarshall@github.com': 
+Enumerating objects: 24, done.
+Counting objects: 100% (24/24), done.
+Delta compression using up to 12 threads
+Compressing objects: 100% (22/22), done.
+Writing objects: 100% (24/24), 6.12 KiB | 2.04 MiB/s, done.
+Total 24 (delta 0), reused 0 (delta 0)
+To https://github.com/monicamarshall/gitops-nginxhello.git
+ * [new branch]      master -> master
+
+
+sudo snap install fluxctl --classic
+
+
+kubectl create namespace flux
+
+
+
+
+fluxctl install --namespace flux --git-url git@github.com:nbrownuk/gitops-nginxhello.git --git-user nbrownuk --git-email 9661038+nbrownuk@users.noreply.github.com | kubectl apply -f -
+
+https://github.com/monicamarshall/gitops-nginxhello.git
+
+
+
+fluxctl install --namespace flux --git-url git@github.com:monicamarshall/gitops-nginxhello.git --git-user monicamarshall --git-email marshallmonica@yahoo.com | kubectl apply -f -
+
+export FLUX_FORWARD_NAMESPACE=flux    #set env variable for flux to find the public key in the flux namespace. 
+
+####################   Retrieve public key for flux ##############################3
+
+fluxctl identity
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFtSBGeVDElfs2h/cHd8zKZqqlM1dGlLljvxokb7+jFNveUHVuvMdUTauwbM5X7tjMkphWky2xCm1hoikFN+1RNCgF9PPJxfOzKzo38S/l9sgVLGHkopFjzxdpY+NNe2yO8HbasiYF64+4hAhLDb1FkEAXMy/3RTykRRc7XEDAWtnsCW9tqf9eBqiDxOGREZwvO6hcOuI2vLd4I/Ez83jJ5srT38XBhQhUT6W2wAB+TnVLfTaunO0hXjh/fbfoy+ZG8isMYnnVce6M/dsMvyyjziSN6/e70GxKnkxCqf+qjlW9uf8FrgGYygPi5B9+ns1Ma5zWe9FiYw8OMrpAkpofzNJy9fLXPp8TsN7eqtGBEBNBwIxmzsram7yMXh4y52k5aBRV7lkkczqH7QoOpXgrXF1FfbqMUuy80zei91aCRjWNThrx2nIL34wsBsVZSpN6HSxFkNniMVxoG3prC84dXqtIyQcXCY022J0JrexsJCUxwFGSysqSaeaRcYHBBuc= root@flux-66c9b89f86-qvh9x
+
+
+kubectl -n flux get all
+NAME                            READY   STATUS    RESTARTS   AGE
+pod/flux-66c9b89f86-qvh9x       1/1     Running   0          4m6s
+pod/memcached-c86cd995d-58498   1/1     Running   0          4m6s
+
+NAME                TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+service/memcached   ClusterIP   10.96.141.113   <none>        11211/TCP   4m6s
+
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/flux        1/1     1            1           4m6s
+deployment.apps/memcached   1/1     1            1           4m6s
+
+NAME                                  DESIRED   CURRENT   READY   AGE
+replicaset.apps/flux-66c9b89f86       1         1         1       4m6s
+replicaset.apps/memcached-c86cd995d   1         1         1       4m6s
+
+
+kubectl -n flux logs flux-66c9b89f86-qvh9x    #The public key shows up in the logs
+
+
+fluxctl identity --k8s-fwd-ns flux
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDFtSBGeVDElfs2h/cHd8zKZqqlM1dGlLljvxokb7+jFNveUHVuvMdUTauwbM5X7tjMkphWky2xCm1hoikFN+1RNCgF9PPJxfOzKzo38S/l9sgVLGHkopFjzxdpY+NNe2yO8HbasiYF64+4hAhLDb1FkEAXMy/3RTykRRc7XEDAWtnsCW9tqf9eBqiDxOGREZwvO6hcOuI2vLd4I/Ez83jJ5srT38XBhQhUT6W2wAB+TnVLfTaunO0hXjh/fbfoy+ZG8isMYnnVce6M/dsMvyyjziSN6/e70GxKnkxCqf+qjlW9uf8FrgGYygPi5B9+ns1Ma5zWe9FiYw8OMrpAkpofzNJy9fLXPp8TsN7eqtGBEBNBwIxmzsram7yMXh4y52k5aBRV7lkkczqH7QoOpXgrXF1FfbqMUuy80zei91aCRjWNThrx2nIL34wsBsVZSpN6HSxFkNniMVxoG3prC84dXqtIyQcXCY022J0JrexsJCUxwFGSysqSaeaRcYHBBuc= root@flux-66c9b89f86-qvh9x
+
+
+kubectl -n flux get secrets flux-git-deploy
+
+
+
+
+kubectl -n flux exec flux-66c9b89f86-qvh9x -- cat /etc/fluxd/ssh/identity    #The private key for flux is stored in /etc/fluxd/ssh/identity in the flux pod
+
+
+
+-----BEGIN OPENSSH PRIVATE KEY-----
+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
+-----END OPENSSH PRIVATE KEY-----
+
+
+
+
+
+#############  create trust relationship between github and flux ########################3
+
+fluxctl install --namespace flux --git-url git@github.com:monicamarshall/gitops-nginxhello.git --git-user monicamarshall --git-email marshallmonica@yahoo.com | kubectl apply -f -
+
+################ remove flux ignore = true from files to allow flux to sync between the repo and kubernetes files ############
+
+sed -i 's/\(^[[:space:]]*fluxcd.io\/ignore: "\)true\("$\)/\1false\2/' gitops-nginxhello/*.yaml
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ fluxctl list-workloads
+WORKLOAD                       CONTAINER   IMAGE                     RELEASE  POLICY
+default:deployment/nginxhello  nginxhello  nbrown/nginxhello:1.19.0  ready    
+
+
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ fluxctl list-images
+WORKLOAD                       CONTAINER   IMAGE              CREATED
+default:deployment/nginxhello  nginxhello  nbrown/nginxhello  
+                                           |   1.19           18 Aug 20 12:01 UTC
+                                           |   1.19.2         18 Aug 20 12:01 UTC
+                                           |   latest         18 Aug 20 12:01 UTC
+                                           |   mainline       18 Aug 20 12:01 UTC
+                                           |   1.19.1         18 Aug 20 11:46 UTC
+                                           '-> 1.19.0         01 Jun 20 09:14 UTC
+                                               1.18           04 May 20 13:22 UTC
+                                               1.18.0         04 May 20 13:22 UTC
+                                               stable         04 May 20 13:22 UTC
+                                               1.17           04 May 20 13:17 UTC
+
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ fluxctl policy -w=default:deployment/nginxhello --automate
+WORKLOAD                       STATUS   UPDATES
+default:deployment/nginxhello  success  
+Commit pushed:	1145dfc
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ fluxctl list-images
+WORKLOAD                       CONTAINER   IMAGE              CREATED
+default:deployment/nginxhello  nginxhello  nbrown/nginxhello  
+                                           '-> 1.19           18 Aug 20 12:01 UTC
+                                               1.19.2         18 Aug 20 12:01 UTC
+                                               latest         18 Aug 20 12:01 UTC
+                                               mainline       18 Aug 20 12:01 UTC
+                                               1.19.1         18 Aug 20 11:46 UTC
+                                               1.19.0         01 Jun 20 09:14 UTC
+                                               1.18           04 May 20 13:22 UTC
+                                               1.18.0         04 May 20 13:22 UTC
+                                               stable         04 May 20 13:22 UTC
+                                               1.17           04 May 20 13:17 UTC
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ 
+
+
+
+fluxctl policy -w=default:deployment/nginxhello --tag='nginxhello=semver:~1.19.x'
+WORKLOAD                       STATUS   UPDATES
+default:deployment/nginxhello  success  
+Commit pushed:	555c1fc
+
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ 
+
+
+fluxctl list-images
+WORKLOAD                       CONTAINER   IMAGE              CREATED
+default:deployment/nginxhello  nginxhello  nbrown/nginxhello  
+                                           |   1.19.2         18 Aug 20 12:01 UTC
+                                           |   1.19.1         18 Aug 20 11:46 UTC
+                                           |   1.19.0         01 Jun 20 09:14 UTC
+                                           '-> 1.19           18 Aug 20 12:01 UTC
+                                               1.18.0         04 May 20 13:22 UTC
+                                               1.18           04 May 20 13:22 UTC
+                                               1.17.10        04 May 20 13:17 UTC
+                                               1.17.9         30 Mar 20 14:28 UTC
+                                               1.17.5         08 Nov 19 14:29 UTC
+                                               1.17           04 May 20 13:17 UTC
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ 
+
+
+fluxctl policy -w=default:deployment/nginxhello --deautomate
+WORKLOAD                       STATUS   UPDATES
+default:deployment/nginxhello  success  
+Commit pushed:	6a5691e
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello$ 
+
+
+fluxctl list-images
+WORKLOAD                       CONTAINER   IMAGE              CREATED
+default:deployment/nginxhello  nginxhello  nbrown/nginxhello  
+                                           |   1.19.2         18 Aug 20 12:01 UTC
+                                           |   1.19.1         18 Aug 20 11:46 UTC
+                                           |   1.19.0         01 Jun 20 09:14 UTC
+                                           '-> 1.19           18 Aug 20 12:01 UTC
+                                               1.18.0         04 May 20 13:22 UTC
+                                               1.18           04 May 20 13:22 UTC
+                                               1.17.10        04 May 20 13:17 UTC
+                                               1.17.9         30 Mar 20 14:28 UTC
+                                               1.17.5         08 Nov 19 14:29 UTC
+                                               1.17           04 May 20 13:17 UTC
+
+extend kubernetes api to make it aware of the crds that helm operator uses for helm release resources.  we use the helm package manager to install the helm operator.  helm  needs to know where to find the helm operator chart.  
+
+
+
+
+
+kubectl apply -f https://raw.githubusercontent.com/fluxcd/helm-operator/1.2.0/deploy/crds.yaml
+
+
+
+helm repo add fluxcd https://charts.fluxcd.io
+
+
+"fluxcd" has been added to your repositories
+
+#############   Helm install helm-operator
+
+helm install helm-operator fluxcd/helm-operator -n flux --set helm.versions=v3 --set git.ssh.secretName=flux-git-deploy
+
+
+
+
+
+
+
+W0323 20:45:05.448196  793761 warnings.go:70] apiextensions.k8s.io/v1beta1 CustomResourceDefinition is deprecated in v1.16+, unavailable in v1.22+; use apiextensions.k8s.io/v1 CustomResourceDefinition
+W0323 20:45:05.700702  793761 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRole is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRole
+W0323 20:45:05.702019  793761 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding
+W0323 20:45:05.740144  793761 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRole is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRole
+W0323 20:45:05.744160  793761 warnings.go:70] rbac.authorization.k8s.io/v1beta1 ClusterRoleBinding is deprecated in v1.17+, unavailable in v1.22+; use rbac.authorization.k8s.io/v1 ClusterRoleBinding
+NAME: helm-operator
+LAST DEPLOYED: Tue Mar 23 20:45:05 2021
+NAMESPACE: flux
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+Flux Helm Operator docs https://docs.fluxcd.io
+
+Example:
+
+AUTH_VALUES=$(cat <<-END
+usePassword: true
+password: "redis_pass"
+usePasswordFile: true
+END
+)
+
+kubectl create secret generic redis-auth --from-literal=values.yaml="$AUTH_VALUES"
+
+cat <<EOF | kubectl apply -f -
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: redis
+  namespace: default
+spec:
+  releaseName: redis
+  chart:
+    repository: https://kubernetes-charts.storage.googleapis.com
+    name: redis
+    version: 10.5.7
+  valuesFrom:
+  - secretKeyRef:
+      name: redis-auth
+  values:
+    master:
+      persistence:
+        enabled: false
+    volumePermissions:
+      enabled: true
+    metrics:
+      enabled: true
+    cluster:
+      enabled: false
+EOF
+
+watch kubectl get hr
+
+
+###############   helm-operator pod, service, deployment, replicaset
+
+kubectl -n flux get all -l app=helm-operator
+NAME                                 READY   STATUS    RESTARTS   AGE
+pod/helm-operator-74b57db4c9-zq4ml   1/1     Running   0          5m37s
+
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/helm-operator   ClusterIP   10.99.46.175   <none>        3030/TCP   5m37s
+
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/helm-operator   1/1     1            1           5m37s
+
+NAME                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/helm-operator-74b57db4c9   1         1         1       5m37s
+
+####################  Replace <git user> with username ###################
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+grep -R git .
+./chart/Chart.yaml:  - https://github.com/<git user>/gitops-nginxhello
+./chart/.helmignore:.git/
+./chart/.helmignore:.gitignore
+./nginxhello-hr.yaml:    git: ssh://git@github.com/<git user>/gitops-nginxhello.git
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+find . -type f -exec sed -i 's/<git user>/monicamarshall/g' {} +
+
+
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm$ 
+
+
+grep -R git .
+./chart/Chart.yaml:  - https://github.com/monicamarshall/gitops-nginxhello
+./chart/.helmignore:.git/
+./chart/.helmignore:.gitignore
+./nginxhello-hr.yaml:    git: ssh://git@github.com/monicamarshall/gitops-nginxhello.git
