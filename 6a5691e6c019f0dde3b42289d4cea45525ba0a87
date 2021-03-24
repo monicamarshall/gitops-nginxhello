@@ -1,0 +1,1 @@
+{"jobID":"f08ca1cb-bf2a-0c49-0987-13e7e82a848d","spec":{"type":"policy","cause":{"Message":"","User":"monicamarshall \u003cmarshallmonica@yahoo.com\u003e"},"spec":{"default:deployment/nginxhello":{"add":{},"remove":{"automated":"true"}}}},"result":null}
