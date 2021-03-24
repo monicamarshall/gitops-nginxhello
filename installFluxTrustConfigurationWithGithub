@@ -440,4 +440,13 @@ replicaset.apps/nginxhello-6779778f7f              0         0         0       1
 replicaset.apps/nginxhello-85ccf4896c              0         0         0       115m
 replicaset.apps/nginxhello-8f55d85d5               5         5         5       10h
 
+####################  Edited values.yaml and replaced the image tag with a non existing version to cause a deployment failure 
+and a roll back  ####################
 
+
+monica@monica-HP-ZBook-G5:~/data/flux/gitops-nginxhello/helm/chart$ helm history default-nginxhello-hr
+REVISION	UPDATED                 	STATUS         	CHART           	APP VERSION	DESCRIPTION                                                                
+1       	Wed Mar 24 04:05:55 2021	superseded     	nginxhello-1.0.0	1.19.0     	Install complete                                                           
+2       	Wed Mar 24 04:51:33 2021	failed         	nginxhello-1.0.1	1.19.27    	Upgrade "default-nginxhello-hr" failed: timed out waiting for the condition
+3       	Wed Mar 24 04:56:34 2021	deployed       	nginxhello-1.0.0	1.19.0     	Rollback to 1                                                              
+4       	Wed Mar 24 04:56:35 2021	pending-upgrade	nginxhello-1.0.1	1.19.27    	Preparing upgrade   
